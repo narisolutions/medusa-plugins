@@ -1,5 +1,3 @@
-
-
 import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework"
 import {
   ContainerRegistrationKeys,
