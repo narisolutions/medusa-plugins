@@ -6,15 +6,22 @@
   "license": "Apache-2.0",
   "main": ".medusa/server/src/index.js",
   "types": ".medusa/server/src/index.d.ts",
-  "files": [".medusa/server"],
+  "files": [
+    ".medusa/server"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/narisolutions/medusa-plugins.git"
   },
-  "keywords": ["medusa", "medusa-plugin", "pos", "point-of-sale"],
+  "keywords": [
+    "medusa",
+    "medusa-plugin",
+    "pos",
+    "point-of-sale"
+  ],
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
-    "dev": "tsc --project tsconfig.build.json --watch",
+    "build": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json",
+    "dev": "tsc --project tsconfig.build.json --watch & tsc-alias --project tsconfig.build.json --watch",
     "prepublishOnly": "yarn build",
     "test": "vitest run",
     "lint": "eslint src --ext .ts"
@@ -29,6 +36,7 @@
     "@medusajs/test-utils": "^2.15.1",
     "@medusajs/utils": "^2.15.1",
     "@types/node": "^20.0.0",
+    "tsc-alias": "^1.8.17",
     "typescript": "^5.6.2",
     "vitest": "^2.0.0"
   }

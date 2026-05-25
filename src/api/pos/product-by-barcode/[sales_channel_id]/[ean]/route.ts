@@ -8,9 +8,10 @@ import {
   QueryContext,
 } from "@medusajs/utils"
 
-import { resolveProductFields } from "../../../../../utils/product-fields"
-import { parsePosQueryParams } from "../../../../../utils/query-params"
-import { getPluginOptions } from "../../../../../index"
+
+import { resolveProductFields } from "@/utils/product-fields"
+import { parsePosQueryParams } from "@/utils/query-params"
+import { getPluginOptions } from "@/index"
 
 export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   const { sales_channel_id, ean } = req.params

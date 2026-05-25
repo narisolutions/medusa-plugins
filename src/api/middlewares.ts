@@ -1,5 +1,5 @@
 import { authenticate, type MiddlewaresConfig } from "@medusajs/framework"
-import { getPluginOptions } from "../index"
+import { getPluginOptions } from "@/index"
 
 class SimpleRateLimiter {
   private store = new Map<string, { count: number; resetAt: number }>()
