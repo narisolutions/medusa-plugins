@@ -1,11 +1,11 @@
-# medusa-plugin-pos
+# @narisolutions/medusa-plugin-pos
 
 Medusa v2 plugin that adds optimized POS (Point of Sale) endpoints to your backend. Built by [Nari Solutions](https://github.com/narisolutions).
 
 ## Installation
 
 ```bash
-yarn add medusa-plugin-pos
+yarn add @narisolutions/medusa-plugin-pos
 ```
 
 ## Setup
@@ -13,7 +13,7 @@ yarn add medusa-plugin-pos
 Add the plugin to your `medusa-config.ts`:
 
 ```ts
-import PosPlugin from "medusa-plugin-pos"
+import PosPlugin from "@narisolutions/medusa-plugin-pos"
 
 export default defineConfig({
   plugins: [
@@ -27,6 +27,11 @@ export default defineConfig({
   ],
 })
 ```
+
+## API Documentation
+
+- [`docs/endpoints.md`](docs/endpoints.md) — endpoint reference with rationale and retirement criteria
+- [`openapi.yaml`](openapi.yaml) — OpenAPI 3.1 spec (parameters, schemas, status codes)
 
 ## Endpoints
 

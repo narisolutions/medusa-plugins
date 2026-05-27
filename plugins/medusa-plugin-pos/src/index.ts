@@ -9,7 +9,7 @@ export function getPluginOptions(): PosPluginOptions {
 export default function PosPlugin(options: PosPluginOptions = {}) {
   _options = options
   return {
-    resolve: "medusa-plugin-pos",
+    resolve: "@narisolutions/medusa-plugin-pos",
     options: options as Record<string, unknown>,
   }
 }

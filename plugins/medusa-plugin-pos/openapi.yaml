@@ -1,0 +1,424 @@
+openapi: "3.1.0"
+
+info:
+  title: "@narisolutions/medusa-plugin-pos"
+  version: "0.1.0"
+  description: >
+    POS (Point of Sale) API extension for Medusa v2. Adds optimized endpoints
+    that fill gaps in Medusa's store/admin APIs: combined product+inventory
+    responses, barcode/EAN lookup, and a lightweight health check.
+  contact:
+    name: Nari Solutions
+    url: https://github.com/narisolutions
+
+servers:
+  - url: "{baseUrl}"
+    variables:
+      baseUrl:
+        default: http://localhost:9000
+        description: Your Medusa backend URL
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Medusa admin user JWT. Obtain via POST /auth/user/emailpass.
+        Applied globally to all /pos/* routes by middlewares.ts using
+        authenticate("user", ["bearer"]).
+
+  schemas:
+    CategoryRef:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        handle: { type: string }
+        parent_category:
+          nullable: true
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            handle: { type: string }
+
+    TagRef:
+      type: object
+      properties:
+        id: { type: string }
+        value: { type: string }
+
+    CollectionRef:
+      nullable: true
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        handle: { type: string }
+
+    OptionValue:
+      type: object
+      properties:
+        id: { type: string }
+        value: { type: string }
+
+    ProductOption:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        values:
+          type: array
+          items: { $ref: "#/components/schemas/OptionValue" }
+
+    Price:
+      type: object
+      properties:
+        id: { type: string }
+        amount: { type: number }
+        currency_code: { type: string }
+        min_quantity: { type: integer, nullable: true }
+        max_quantity: { type: integer, nullable: true }
+
+    CalculatedPrice:
+      nullable: true
+      type: object
+      description: >
+        Present only when currency_code is supplied (via query param or
+        defaultCurrencyCode plugin option). Resolved by Medusa's QueryContext
+        pricing engine.
+      properties:
+        id: { type: string }
+        is_calculated_price_price_list: { type: boolean }
+        is_calculated_price_tax_inclusive: { type: boolean }
+        calculated_amount: { type: number, nullable: true }
+        raw_calculated_amount:
+          type: object
+          nullable: true
+          properties:
+            value: { type: string }
+            precision: { type: integer }
+        original_amount: { type: number, nullable: true }
+        currency_code: { type: string }
+
+    VariantOptionRef:
+      type: object
+      properties:
+        id: { type: string }
+        value: { type: string }
+        option:
+          type: object
+          properties:
+            id: { type: string }
+            title: { type: string }
+
+    ProductVariant:
+      type: object
+      description: >
+        Medusa product variant enriched with inventory_quantity.
+        inventory_quantity is NOT a native Medusa field — it is injected
+        by this plugin using getVariantAvailability() after the product query.
+      properties:
+        id: { type: string }
+        title: { type: string }
+        sku: { type: string, nullable: true }
+        barcode: { type: string, nullable: true }
+        ean: { type: string, nullable: true }
+        upc: { type: string, nullable: true }
+        variant_rank: { type: integer, nullable: true }
+        allow_backorder: { type: boolean }
+        manage_inventory: { type: boolean }
+        weight: { type: number, nullable: true }
+        length: { type: number, nullable: true }
+        height: { type: number, nullable: true }
+        width: { type: number, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        deleted_at: { type: string, format: date-time, nullable: true }
+        product_id: { type: string }
+        options:
+          type: array
+          items: { $ref: "#/components/schemas/VariantOptionRef" }
+        prices:
+          type: array
+          items: { $ref: "#/components/schemas/Price" }
+        calculated_price:
+          $ref: "#/components/schemas/CalculatedPrice"
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              url: { type: string }
+        inventory_quantity:
+          type: integer
+          description: >
+            Available stock count for this variant in the queried sales channel.
+            Injected by the plugin via getVariantAvailability(). Defaults to 0
+            if no inventory item is linked.
+
+    Product:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        subtitle: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        handle: { type: string }
+        status:
+          type: string
+          enum: [draft, proposed, published, rejected]
+        thumbnail: { type: string, nullable: true }
+        weight: { type: number, nullable: true }
+        length: { type: number, nullable: true }
+        height: { type: number, nullable: true }
+        width: { type: number, nullable: true }
+        hs_code: { type: string, nullable: true }
+        origin_country: { type: string, nullable: true }
+        mid_code: { type: string, nullable: true }
+        material: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        deleted_at: { type: string, format: date-time, nullable: true }
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              url: { type: string }
+        categories:
+          type: array
+          items: { $ref: "#/components/schemas/CategoryRef" }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/TagRef" }
+        collection:
+          $ref: "#/components/schemas/CollectionRef"
+        options:
+          type: array
+          items: { $ref: "#/components/schemas/ProductOption" }
+        variants:
+          type: array
+          items: { $ref: "#/components/schemas/ProductVariant" }
+
+    ErrorResponse:
+      type: object
+      properties:
+        message: { type: string }
+        type: { type: string }
+        code: { type: string, nullable: true }
+
+paths:
+  /pos/health:
+    get:
+      operationId: posHealth
+      summary: Health check
+      description: >
+        Lightweight liveness check. Returns immediately without a database query.
+        Requires a valid admin bearer token to prevent unauthenticated probing.
+
+        **Rationale:** The POS app needs to verify backend reachability on startup
+        and after reconnects. Medusa does not expose a lightweight, plugin-scoped
+        health endpoint. Using Medusa's own /health endpoint is possible but may
+        not be routed through the same middleware chain or may change behavior
+        across Medusa versions.
+
+        **Retirement criteria:** This endpoint can be removed when Medusa exposes
+        a stable, authenticated health endpoint that is guaranteed to remain
+        accessible at a fixed path across minor versions, or when the POS app is
+        restructured to check Medusa's native health directly without depending
+        on plugin routing.
+      responses:
+        "200":
+          description: Backend is reachable and the plugin is loaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: ["ok"]
+              example:
+                status: "ok"
+        "401":
+          description: Missing or invalid bearer token
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /pos/products/{sales_channel_id}:
+    get:
+      operationId: posListProducts
+      summary: List published products for a sales channel with inventory
+      description: >
+        Returns all published products linked to the given sales channel.
+        Each variant is enriched with inventory_quantity (available stock
+        count in this sales channel). Optionally includes calculated_price
+        per variant when currency_code is provided.
+
+        Responses are cached with Medusa's Query cache (autoInvalidate: true),
+        so repeated calls are fast and cache entries are invalidated on product
+        or inventory changes.
+
+        **Rationale:** Medusa's store API (/store/products) does not return
+        inventory_quantity on variants. Fetching inventory separately would
+        require N+1 requests per product. This endpoint performs a single
+        graph query for products + a single getVariantAvailability() call,
+        giving the POS a complete product+stock payload in one round-trip.
+        The calculated_price inclusion via QueryContext is also more ergonomic
+        than constructing a pricing context through the store pricing API.
+
+        **Retirement criteria:** This endpoint can be removed when all of the
+        following are true:
+          1. Medusa's store API (or a supported admin API variant) returns
+             inventory_quantity on variant objects natively in a single call.
+          2. Medusa supports passing a currency_code to get calculated_price
+             on variants without a separate pricing context query.
+        Observable signals: medusajs/medusa store API changelog; variant
+        response shape in /store/products or /admin/products.
+      parameters:
+        - name: sales_channel_id
+          in: path
+          required: true
+          schema: { type: string }
+          description: Medusa SalesChannel ID (e.g. sc_01JXXX...)
+        - name: currency_code
+          in: query
+          required: false
+          schema: { type: string }
+          description: >
+            ISO 4217 currency code (e.g. usd, eur). When present, each variant
+            includes a calculated_price object. Falls back to the
+            defaultCurrencyCode plugin option if omitted. If neither is set,
+            calculated_price is not included.
+        - name: custom_fields
+          in: query
+          required: false
+          schema: { type: string }
+          description: >
+            Comma-separated list of additional Medusa graph field selectors to
+            merge into the default field selection. Each field is automatically
+            prefixed with products_link.product. — e.g. passing
+            "type.id,type.value" resolves to
+            "products_link.product.type.id" etc.
+      responses:
+        "200":
+          description: >
+            Array of published product objects. Only products with
+            status = "published" are included. Empty array if no products are
+            linked or published.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+        "401":
+          description: Missing or invalid bearer token
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "429":
+          description: >
+            Rate limit exceeded. Only returned when the rateLimit plugin option
+            is configured. Headers do not include Retry-After.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Too many requests" }
+
+  /pos/product-by-barcode/{sales_channel_id}/{ean}:
+    get:
+      operationId: posProductByBarcode
+      summary: Look up a single product by variant barcode or EAN
+      description: >
+        Finds the product whose variant matches the given barcode/EAN value.
+        The lookup is a two-step fallback: first tries the barcode field, then
+        the ean field. Returns the full product with all variants enriched with
+        inventory_quantity (and optionally calculated_price).
+
+        The sales_channel_id is used only for the inventory availability query —
+        the product itself is not filtered by sales channel membership.
+
+        **Rationale:** Medusa has no first-class barcode or EAN lookup endpoint
+        in either the store or admin API. The only way to find a variant by
+        barcode is to query product_variant with a filter, which is not exposed
+        via any public API surface. The two-step fallback (barcode → ean) is
+        required because merchants may populate either field depending on their
+        import workflow. POS scanners emit EAN-13 or UPC-A codes that may map
+        to either field.
+
+        **Retirement criteria:** This endpoint can be removed when Medusa exposes
+        a native barcode/EAN lookup — e.g., a /store/variants?barcode= or
+        /admin/product-variants?barcode= endpoint that resolves variants (and
+        their parent products) by barcode or EAN in a single call.
+        Observable signal: medusajs/medusa store or admin API changelog; a
+        variant search endpoint accepting barcode/ean filters.
+      parameters:
+        - name: sales_channel_id
+          in: path
+          required: true
+          schema: { type: string }
+          description: >
+            Medusa SalesChannel ID. Used to scope the inventory availability
+            query (inventory_quantity reflects stock in this channel).
+        - name: ean
+          in: path
+          required: true
+          schema: { type: string }
+          description: >
+            Barcode or EAN value to look up. The endpoint tries this value
+            against the variant barcode field first, then the ean field.
+        - name: currency_code
+          in: query
+          required: false
+          schema: { type: string }
+          description: >
+            ISO 4217 currency code. When present, each variant includes a
+            calculated_price object. Falls back to defaultCurrencyCode plugin
+            option if omitted.
+        - name: custom_fields
+          in: query
+          required: false
+          schema: { type: string }
+          description: >
+            Comma-separated list of additional Medusa graph field selectors.
+            Merged directly into the product field list (no prefix).
+      responses:
+        "200":
+          description: Product whose variant matched the barcode/EAN
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        "401":
+          description: Missing or invalid bearer token
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: >
+            No variant found with the given barcode or EAN value.
+            Thrown as a MedusaError(NOT_FOUND).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+              example:
+                message: "Product with barcode <ean> not found."
+                type: "not_found"
+        "429":
+          description: Rate limit exceeded (when rateLimit plugin option is set)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Too many requests" }
