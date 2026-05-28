@@ -9,19 +9,19 @@
   ],
   "exports": {
     ".": {
-      "require": "./.medusa/server/index.js",
-      "default": "./.medusa/server/index.js"
+      "require": "./.medusa/server/src/index.js",
+      "default": "./.medusa/server/src/index.js"
     },
     "./package.json": "./package.json",
-    "./workflows": "./.medusa/server/workflows/index.js",
-    "./.medusa/server/modules/*": "./.medusa/server/modules/*/index.js",
-    "./providers/*": "./.medusa/server/providers/*/index.js",
+    "./workflows": "./.medusa/server/src/workflows/index.js",
+    "./.medusa/server/modules/*": "./.medusa/server/src/modules/*/index.js",
+    "./providers/*": "./.medusa/server/src/providers/*/index.js",
     "./admin": {
       "import": "./.medusa/server/src/admin/index.mjs",
       "require": "./.medusa/server/src/admin/index.js",
       "default": "./.medusa/server/src/admin/index.js"
     },
-    "./*": "./.medusa/server/*.js"
+    "./*": "./.medusa/server/src/*.js"
   },
   "repository": {
     "type": "git",
@@ -37,10 +37,10 @@
     "nari-solutions"
   ],
   "scripts": {
-    "build": "medusa plugin:build",
+    "build": "medusa plugin:build && node scripts/fix-aliases.js",
     "dev": "medusa plugin:develop",
     "dev:publish": "medusa plugin:publish",
-    "prepublishOnly": "medusa plugin:build",
+    "prepublishOnly": "medusa plugin:build && node scripts/fix-aliases.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts"

@@ -44,7 +44,9 @@ Returns all published products for a sales channel, with inventory quantities pe
 | Query param | Type | Description |
 |---|---|---|
 | `currency_code` | string | Include `calculated_price` for each variant |
-| `custom_fields` | string | Comma-separated extra fields to include |
+| `custom_fields` | string | Comma-separated extra fields appended to the default field list |
+
+The default field list covers core product/variant fields. Fields like `translations.*` are **not** included by default — opt in via `?custom_fields=translations.*`.
 
 **Response:** array of product objects.
 
@@ -52,14 +54,16 @@ Returns all published products for a sales channel, with inventory quantities pe
 
 ### GET `/pos/product-by-barcode/:sales_channel_id/:ean`
 
-Looks up a single product by variant EAN barcode, with inventory quantities.
+Looks up a single product by barcode value, with inventory quantities.
+
+The `:ean` path parameter is matched first against the variant `barcode` field, then falls back to the `ean` field. This means physical barcodes stored in `barcode` work out of the box — `ean` is the fallback for stores that populate that field instead.
 
 | Query param | Type | Description |
 |---|---|---|
 | `currency_code` | string | Include `calculated_price` for each variant |
-| `custom_fields` | string | Comma-separated extra fields to include |
+| `custom_fields` | string | Comma-separated extra fields appended to the default field list (e.g. `translations.*`) |
 
-**Response:** single product object. Returns `404` if no variant matches the EAN.
+**Response:** single product object. Returns `404` if no variant matches either field.
 
 ---
 
