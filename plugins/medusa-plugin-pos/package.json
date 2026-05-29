@@ -30,10 +30,12 @@
   },
   "homepage": "https://github.com/narisolutions/medusa-plugins/tree/main/plugins/medusa-plugin-pos",
   "keywords": [
-    "medusa-plugin",
     "medusa-v2",
+    "medusa-plugin-integration",
+    "medusa-plugin-other",
     "pos",
     "point-of-sale",
+    "calculated-price",
     "nari-solutions"
   ],
   "scripts": {

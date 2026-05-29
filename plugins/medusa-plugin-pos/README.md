@@ -1,6 +1,8 @@
 # @narisolutions/medusa-plugin-pos
 
-Medusa v2 plugin that adds optimized POS (Point of Sale) endpoints to your backend. Built by [Nari Solutions](https://github.com/narisolutions).
+Medusa v2 plugin that adds the product endpoints any POS (Point of Sale) app needs. Built by [Nari Solutions](https://github.com/narisolutions).
+
+Without these custom endpoints, a POS talking to Medusa's generic API has two problems: **stock isn't checked automatically** when adding items to a cart, and **prices come back raw — not context-calculated**. This plugin's `/pos/*` endpoints return live inventory quantities per variant and context-calculated prices (`?currency_code=`), plus a `?custom_fields=` option to choose exactly which product fields you fetch.
 
 ## Installation
 
