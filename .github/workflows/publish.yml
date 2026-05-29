@@ -21,6 +21,8 @@ jobs:
 
       - run: yarn workspace @narisolutions/medusa-plugin-pos build
 
+      - run: yarn workspace @narisolutions/medusa-plugin-pos test
+
       - name: Publish to npm
         run: npm publish --access public
         working-directory: plugins/medusa-plugin-pos
