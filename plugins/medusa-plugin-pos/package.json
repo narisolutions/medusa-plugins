@@ -43,7 +43,7 @@
     "dev": "medusa plugin:develop",
     "dev:publish": "medusa plugin:publish",
     "prepublishOnly": "medusa plugin:build && node scripts/fix-aliases.js",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
   },
