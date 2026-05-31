@@ -25,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/narisolutions/medusa-plugins.git",
+    "url": "git+https://github.com/narisolutions/medusa-plugins.git",
     "directory": "plugins/medusa-plugin-pos"
   },
   "homepage": "https://github.com/narisolutions/medusa-plugins/tree/main/plugins/medusa-plugin-pos",
