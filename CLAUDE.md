@@ -81,4 +81,6 @@ yarn test:env:reset
 
 Admin credentials: `admin@example.com` / `supersecret`. Seeds a "POS Channel" sales channel + 5 products with `barcode` set (e.g. `5901234123457`), `ean` is null.
 
-The harness installs the plugin via `npm pack` tarball extracted directly into `node_modules` in the Dockerfile — a plain `npm install` of the tarball hangs forever on Medusa's peer-dep graph.
+The harness installs the plugin as a normal dependency from the npm registry (`@narisolutions/medusa-plugin-pos` pinned in `integration-tests/medusa/package.json`). This was verified end-to-end against `0.1.1` on 2026-06-01.
+
+Earlier the harness extracted an `npm pack` tarball directly into `node_modules` because a plain `npm install` HUNG. That hang turned out to be specific to installing a **local `.tgz` file** — registry resolution by name+version installs cleanly and does NOT hang. Do not reintroduce the tarball-extraction workaround.
