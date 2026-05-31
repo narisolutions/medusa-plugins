@@ -50,6 +50,9 @@
     "@medusajs/framework": ">=2.15.0",
     "@medusajs/medusa": ">=2.15.0"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@medusajs/cli": "^2.15.1",
     "@medusajs/framework": "^2.15.1",
