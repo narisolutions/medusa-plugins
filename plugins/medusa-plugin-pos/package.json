@@ -1,6 +1,6 @@
 {
   "name": "@narisolutions/medusa-plugin-pos",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Medusa v2 plugin providing optimized POS endpoints",
   "author": "Nari Solutions",
   "license": "Apache-2.0",
@@ -42,7 +42,6 @@
     "build": "medusa plugin:build && node scripts/fix-aliases.js",
     "dev": "medusa plugin:develop",
     "dev:publish": "medusa plugin:publish",
-    "prepublishOnly": "medusa plugin:build && node scripts/fix-aliases.js",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
