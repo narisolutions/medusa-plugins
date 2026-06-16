@@ -6,12 +6,12 @@ import {
 } from "@medusajs/utils"
 import { resolveSalesChannelProductFields } from "@/utils/product-fields"
 import { parsePosQueryParams } from "@/utils/query-params"
-import { getPluginOptions } from "@/index"
+import { getPluginOptions } from "@/utils/plugin-options"
 
 export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   const { sales_channel_id } = req.params
   const { currency_code: qsCurrency, custom_fields } = parsePosQueryParams(req)
-  const currency_code = qsCurrency ?? getPluginOptions().defaultCurrencyCode
+  const currency_code = qsCurrency ?? getPluginOptions(req.scope).defaultCurrencyCode
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 
   const fields = resolveSalesChannelProductFields(custom_fields)
