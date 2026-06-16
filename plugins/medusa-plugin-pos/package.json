@@ -1,6 +1,6 @@
 {
   "name": "@narisolutions/medusa-plugin-pos",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Medusa v2 plugin providing optimized POS endpoints",
   "author": "Nari Solutions",
   "license": "Apache-2.0",

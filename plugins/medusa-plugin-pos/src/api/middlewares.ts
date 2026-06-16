@@ -1,5 +1,5 @@
 import { authenticate, type MiddlewaresConfig } from "@medusajs/framework"
-import { getPluginOptions } from "@/index"
+import { getPluginOptions } from "@/utils/plugin-options"
 
 class SimpleRateLimiter {
   private store = new Map<string, { count: number; resetAt: number }>()
@@ -38,7 +38,7 @@ let _limiterInitialized = false
 const posRateLimitMiddleware = (req: any, res: any, next: any) => {
   if (!_limiterInitialized) {
     _limiterInitialized = true
-    const opts = getPluginOptions().rateLimit
+    const opts = getPluginOptions(req.scope).rateLimit
     if (opts) {
       _limiterMiddleware = new SimpleRateLimiter(opts.windowMs, opts.max).middleware()
     }
