@@ -6,7 +6,7 @@ A monorepo of [Medusa v2](https://medusajs.com) plugins by [Nari Solutions](http
 
 | Package | Description |
 |---|---|
-| [`@narisolutions/medusa-plugin-pos`](plugins/medusa-plugin-pos) | Product endpoints any POS app needs — context-calculated prices, live stock per variant, and configurable field selection. |
+| [`@narisolutions/medusa-plugin-pos`](plugins/medusa-plugin-pos) | Backend for [Medusa POS](https://github.com/narisolutions/medusa-pos) — context-calculated prices, live stock per variant, and configurable field selection. |
 
 See each plugin's own README for installation, configuration, and API details.
 
